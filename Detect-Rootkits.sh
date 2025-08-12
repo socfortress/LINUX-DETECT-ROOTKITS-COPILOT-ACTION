@@ -1,10 +1,7 @@
 #!/bin/sh
 set -eu
 
-# ==============================
-# CONFIGURATION
-# ==============================
-ScriptName="SCRIPT_NAME_HERE"
+ScriptName="Detect-Rootkits"
 LogPath="/tmp/${ScriptName}-script.log"
 ARLog="/var/ossec/active-response/active-responses.log"
 LogMaxKB=100
@@ -12,9 +9,8 @@ LogKeep=5
 HostName="$(hostname)"
 runStart=$(date +%s)
 
-# ==============================
-# LOGGING FUNCTIONS
-# ==============================
+PROC_MODULES_FILE="${1:-/proc/modules}"
+
 WriteLog() {
   Message="$1"; Level="${2:-INFO}"
   ts="$(date '+%Y-%m-%d %H:%M:%S')"
@@ -39,15 +35,10 @@ RotateLog() {
   done
   mv -f "$LogPath" "$LogPath.1"
 }
-
-# Escape text for safe JSON
 escape_json() {
   printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
 }
 
-# ==============================
-# PRE-RUN SETUP
-# ==============================
 RotateLog
 
 if ! rm -f "$ARLog" 2>/dev/null; then
@@ -58,22 +49,42 @@ else
 fi
 
 WriteLog "=== SCRIPT START : $ScriptName ==="
+WriteLog "Collecting loaded kernel modules..." INFO
+process_json_list=""
+proc_list=$(awk '{print $1}' "$PROC_MODULES_FILE")
+lsmod_list=$(lsmod | awk '{print $1}' | tail -n +2)
 
-# ==============================
-# MAIN SCRIPT LOGIC
-# ==============================
-# REPLACE THE BLOCK BELOW WITH YOUR SPECIFIC LOGIC
-# Must produce JSON payload and assign it to $final_json
+for module in $proc_list; do
+    path=$(modinfo -n "$module" 2>/dev/null || echo "")
+    suspicious=0
+    reason=""
+    if ! modinfo "$module" 2>/dev/null | grep -qi 'signature'; then
+        suspicious=1
+        reason="Unsigned module"
+    fi
+    if [ -n "$path" ] && echo "$path" | grep -Eq '^(/tmp|/var/tmp|/dev/shm)'; then
+        suspicious=1
+        reason="Module loaded from temp directory"
+    fi
+    if ! echo "$lsmod_list" | grep -q "^$module$"; then
+        suspicious=1
+        reason="Module hidden from lsmod"
+    fi
 
-# Example dummy JSON payload
-payload='{"example_key":"example_value"}'
+    if [ "$suspicious" -eq 1 ]; then
+        escaped_module=$(escape_json "$module")
+        escaped_path=$(escape_json "$path")
+        escaped_reason=$(escape_json "$reason")
+        item="{\"module\":\"$escaped_module\",\"path\":\"$escaped_path\",\"reason\":\"$escaped_reason\"}"
+        [ -z "$process_json_list" ] && process_json_list="$item" || process_json_list="$process_json_list,$item"
+    fi
+done
+
+[ -n "$process_json_list" ] && process_json_list="[$process_json_list]" || process_json_list="[]"
 
 ts=$(date --iso-8601=seconds 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S%z')
-final_json="{\"timestamp\":\"$ts\",\"host\":\"$HostName\",\"action\":\"$ScriptName\",\"data\":$payload,\"copilot_soar\":true}"
+final_json="{\"timestamp\":\"$ts\",\"host\":\"$HostName\",\"action\":\"$ScriptName\",\"data\":$process_json_list,\"copilot_soar\":true}"
 
-# ==============================
-# WRITE JSON OUTPUT
-# ==============================
 tmpfile=$(mktemp)
 printf '%s\n' "$final_json" > "$tmpfile"
 if ! mv -f "$tmpfile" "$ARLog" 2>/dev/null; then
@@ -82,8 +93,5 @@ fi
 
 WriteLog "JSON result written to $ARLog" INFO
 
-# ==============================
-# SCRIPT END
-# ==============================
 dur=$(( $(date +%s) - runStart ))
 WriteLog "=== SCRIPT END : duration ${dur}s ==="
