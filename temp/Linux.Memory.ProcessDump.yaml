@@ -1,0 +1,32 @@
+name: Linux.Memory.ProcessDump
+author: socfortress
+description: |
+  Dump process memory and upload to the server.
+
+precondition: SELECT OS FROM info() WHERE OS = 'linux'
+
+parameters:
+  - name: ProcessRegex
+    type: regex
+    default: .
+  - name: PidRegex
+    type: regex
+    default: .
+
+column_types:
+  - name: ProcessMemory
+    type: preview_upload
+
+sources:
+  - query: |
+      SELECT
+        Name AS ProcessName,
+        CommandLine,
+        Pid,
+        upload(
+          accessor="process",
+          file=pathspec(Path=format(format="/%d", args=Pid))
+        ) AS ProcessMemory
+      FROM pslist()
+      WHERE Name =~ ProcessRegex
+        AND str(str=Pid) =~ PidRegex

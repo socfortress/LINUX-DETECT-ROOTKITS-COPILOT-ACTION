@@ -1,0 +1,121 @@
+name: Create Linux Script Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+      script_name:
+        description: 'Script name (without .sh extension)'
+        required: true
+        default: 'automation-template'
+
+env:
+  SCRIPT_NAME: ${{ github.event.inputs.script_name || 'automation-template' }}
+  VERSION: ${{ github.event.inputs.version || github.ref_name }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Debug Directory Structure
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+      
+      - name: Validate Shell Script
+        working-directory: ${{ github.workspace }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+          
+          # Look for script in root directory
+          script_path="./${SCRIPT_NAME}.sh"
+          echo "Looking for script at: $(pwd)/${SCRIPT_NAME}.sh"
+          
+          if [ ! -f "$script_path" ]; then
+            echo "❌ Script not found: $script_path"
+            exit 1
+          fi
+          
+          echo "Found script at: $script_path"
+          if shellcheck "$script_path"; then
+            echo "✅ Shell script syntax is valid"
+          else
+            echo "❌ Shell script contains syntax errors"
+            exit 1
+          fi
+          
+      - name: Build Release
+        run: |
+          echo "Setting up build environment..."
+          chmod +x scripts/build-release.sh
+          
+          echo "Running build script..."
+          ./scripts/build-release.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SCRIPT_PATH: "./${SCRIPT_NAME}.sh"
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.VERSION }}
+          name: ${{ env.SCRIPT_NAME }}-${{ env.VERSION }}
+          body: |
+            ## Linux Active Response Script Release
+            
+            ### ${{ env.SCRIPT_NAME }} ${{ env.VERSION }}
+            
+            Production-ready shell script for active response automation.
+            
+            ### Quick Start
+            
+            **Automated Installation:**
+            ```bash
+            curl -sSL "https://github.com/${{ github.repository }}/releases/download/${{ env.VERSION }}/install.sh" -o install.sh
+            chmod +x install.sh
+            ./install.sh
+            ```
+            
+            **Direct Download:**
+            ```bash
+            curl -sSL "https://github.com/${{ github.repository }}/releases/download/${{ env.VERSION }}/${{ env.SCRIPT_NAME }}.sh" -o "${{ env.SCRIPT_NAME }}.sh"
+            chmod +x "${{ env.SCRIPT_NAME }}.sh"
+            ```
+            
+            ### Files
+            - `${{ env.SCRIPT_NAME }}.sh` - Main shell script
+            - `${{ env.SCRIPT_NAME }}-${{ env.VERSION }}.sh` - Versioned script
+            - `install.sh` - Automated installer
+            - `checksums.txt` - File integrity checksums
+            - `README.md` - Detailed usage instructions
+            
+            ### Security
+            All files include SHA256 checksums for integrity verification.
+            
+            **Build Info:**
+            - Commit: ${{ github.sha }}
+            - Build Date: ${{ github.run_number }}
+            - Runner: ${{ runner.os }}
+            
+          files: |
+            release/*.sh
+            release/checksums.txt
+            release/README.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
