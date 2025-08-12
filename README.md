@@ -1,10 +1,10 @@
-## Detect Rootkits
+## Detect-Rootkits.sh
 
-This script scans for suspicious kernel modules that may indicate the presence of rootkits, providing a JSON-formatted output for integration with security tools like OSSEC/Wazuh.
+This script scans for suspicious kernel modules that may indicate the presence of rootkits, providing a JSON-formatted output for integration with your SIEM.
 
 ### Overview
 
-The `Detect-Rootkits` script identifies potential security risks in loaded kernel modules by analyzing their signatures, paths, and visibility. It outputs results in a standardized JSON format suitable for active response workflows.
+The `Detect-Rootkits.sh` script identifies potential security risks in loaded kernel modules by analyzing their signatures, paths, and visibility. It outputs results in a standardized JSON format suitable for active response workflows.
 
 ### Script Details
 
@@ -21,7 +21,7 @@ The `Detect-Rootkits` script identifies potential security risks in loaded kerne
 
 #### Command Line Execution
 ```bash
-./Detect-Rootkits [PROC_MODULES_FILE]
+./Detect-Rootkits.sh [PROC_MODULES_FILE]
 ```
 
 #### Parameters
@@ -30,7 +30,7 @@ The `Detect-Rootkits` script identifies potential security risks in loaded kerne
 |---------------------|--------|--------------------------------|--------------------------------------------------|
 | `PROC_MODULES_FILE` | string | `/proc/modules`                | Path to the file containing the list of loaded kernel modules |
 | `ARLog`             | string | `/var/ossec/active-response/active-responses.log` | Path for active response JSON output            |
-| `LogPath`           | string | `/tmp/Detect-Rootkits-script.log` | Path for detailed execution logs                |
+| `LogPath`           | string | `/tmp/Detect-Rootkits.sh-script.log` | Path for detailed execution logs                |
 | `LogMaxKB`          | int    | 100                            | Maximum log file size in KB before rotation     |
 | `LogKeep`           | int    | 5                              | Number of rotated log files to retain           |
 
@@ -38,10 +38,10 @@ The `Detect-Rootkits` script identifies potential security risks in loaded kerne
 
 ```bash
 # Run the script with default parameters
-./Detect-Rootkits
+./Detect-Rootkits.sh
 
 # Run the script with a custom modules file
-./Detect-Rootkits /custom/path/to/modules
+./Detect-Rootkits.sh /custom/path/to/modules
 ```
 
 ### Script Execution Flow
@@ -71,7 +71,7 @@ The `Detect-Rootkits` script identifies potential security risks in loaded kerne
 {
   "timestamp": "2025-07-18T10:30:45.123Z",
   "host": "HOSTNAME",
-  "action": "Detect-Rootkits",
+  "action": "Detect-Rootkits.sh",
   "data": [
     {
       "module": "suspicious_module",
@@ -93,7 +93,7 @@ The `Detect-Rootkits` script identifies potential security risks in loaded kerne
 {
   "timestamp": "2025-07-18T10:30:45.123Z",
   "host": "HOSTNAME",
-  "action": "Detect-Rootkits",
+  "action": "Detect-Rootkits.sh",
   "data": [],
   "copilot_soar": true
 }
@@ -121,7 +121,7 @@ The `Detect-Rootkits` script identifies potential security risks in loaded kerne
 #### Debugging
 Enable verbose logging by setting the `VERBOSE` environment variable:
 ```bash
-VERBOSE=1 ./Detect-Rootkits
+VERBOSE=1 ./Detect-Rootkits.sh
 ```
 
 ### Contributing
