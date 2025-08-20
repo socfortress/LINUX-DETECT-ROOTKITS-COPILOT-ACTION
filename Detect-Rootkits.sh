@@ -83,7 +83,7 @@ done
 [ -n "$process_json_list" ] && process_json_list="[$process_json_list]" || process_json_list="[]"
 
 ts=$(date --iso-8601=seconds 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S%z')
-final_json="{\"timestamp\":\"$ts\",\"host\":\"$HostName\",\"action\":\"$ScriptName\",\"data\":$process_json_list,\"copilot_soar\":true}"
+final_json="{\"timestamp\":\"$ts\",\"host\":\"$HostName\",\"action\":\"$ScriptName\",\"data\":$process_json_list,\"copilot_action\":true}"
 
 tmpfile=$(mktemp)
 printf '%s\n' "$final_json" > "$tmpfile"
