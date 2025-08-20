@@ -1,0 +1,19 @@
+{
+  "active_response_name": "LINUX-DETECT-ROOTKITS-ACTIVERESPONSE",
+  "description": "The Detect-Rootkits.sh script identifies potential security risks in loaded kernel modules by analyzing their signatures, paths, and visibility. It outputs results in a standardized JSON format suitable for active response workflows.",
+  "technology": "Linux",
+  "icon": "Linux",
+  "script_parameters": [
+    {
+      "name": "test",
+      "type": "string",
+      "required": false,
+      "description": "Unique run identifier for log correlation",
+      "default": null
+    }
+  ],
+  "repo_url": "https://github.com/socfortress/LINUX-DETECT-ROOTKITS-ACTIVERESPONSE",
+  "script_name": "Detect-Rootkits.sh",
+  "version": "1.0.0",
+  "last_updated": "2025-08-20T00:00:00Z"
+}
