@@ -1,19 +1,47 @@
 {
-  "active_response_name": "LINUX-DETECT-ROOTKITS-ACTIVERESPONSE",
-  "description": "The Detect-Rootkits.sh script identifies potential security risks in loaded kernel modules by analyzing their signatures, paths, and visibility. It outputs results in a standardized JSON format suitable for active response workflows.",
-  "technology": "Linux",
-  "icon": "Linux",
+  "copilot_action_name": "WINDOWS-LIST-WEAK-SECRETS-COPILOT-ACTION",
+  "description": "Recursively scans files for potential plain-text secrets (passwords, API keys, tokens, etc.) within specified directories. Supports configurable root directory, optional exclusion of system folders, and maximum file size limit. Matches against common keywords, calculates SHA256 for flagged files, and outputs NDJSON containing a full summary with flagged files. Writes atomically to the Active Response log with .new fallback.",
+  "technology": "Windows",
+  "icon": "windows",
   "script_parameters": [
     {
-      "name": "test",
+      "name": "LogPath",
       "type": "string",
       "required": false,
-      "description": "Unique run identifier for log correlation",
-      "default": null
+      "description": "Path to the rotating human-readable script log.",
+      "default": "%TEMP%/List-WeakSecrets.log"
+    },
+    {
+      "name": "ARLog",
+      "type": "string",
+      "required": false,
+      "description": "Active Response NDJSON output path (atomic overwrite; falls back to .new if locked).",
+      "default": "C:\\Program Files (x86)\\ossec-agent\\active-response\\active-responses.log"
+    },
+    {
+      "name": "RootDir",
+      "type": "string",
+      "required": false,
+      "description": "Root directory to scan for files containing potential secrets.",
+      "default": "C:\\"
+    },
+    {
+      "name": "ExcludeSystem",
+      "type": "boolean",
+      "required": false,
+      "description": "Exclude system directories from scanning (Windows, Program Files, ProgramData).",
+      "default": false
+    },
+    {
+      "name": "MaxSizeMB",
+      "type": "integer",
+      "required": false,
+      "description": "Maximum file size (in MB) to scan.",
+      "default": 50
     }
   ],
-  "repo_url": "https://github.com/socfortress/LINUX-DETECT-ROOTKITS-ACTIVERESPONSE",
-  "script_name": "Detect-Rootkits.sh",
+  "repo_url": "https://github.com/socfortress/WINDOWS-LIST-WEAK-SECRETS-ACTIVERESPONSE",
+  "script_name": "List-WeakSecrets.ps1",
   "version": "1.0.0",
-  "last_updated": "2025-08-20T00:00:00Z"
+  "last_updated": "2025-08-22T00:00:00Z"
 }
