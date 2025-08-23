@@ -1,47 +1,47 @@
 {
-  "copilot_action_name": "WINDOWS-LIST-WEAK-SECRETS-COPILOT-ACTION",
-  "description": "Recursively scans files for potential plain-text secrets (passwords, API keys, tokens, etc.) within specified directories. Supports configurable root directory, optional exclusion of system folders, and maximum file size limit. Matches against common keywords, calculates SHA256 for flagged files, and outputs NDJSON containing a full summary with flagged files. Writes atomically to the Active Response log with .new fallback.",
-  "technology": "Windows",
-  "icon": "windows",
+  "copilot_action_name": "LINUX-DETECT-ROOTKITS-COPILOT-ACTION",
+  "description": "Detects potential rootkits by scanning loaded kernel modules for suspicious characteristics. Flags unsigned modules, modules loaded from temporary directories, and hidden modules that do not appear in lsmod. Produces structured NDJSON output including module name, file path, and reason for flagging. Writes results atomically to the Active Response log with .new fallback if locked.",
+  "technology": "Linux",
+  "icon": "linux",
   "script_parameters": [
     {
-      "name": "LogPath",
+      "name": "PROC_MODULES_FILE",
       "type": "string",
       "required": false,
-      "description": "Path to the rotating human-readable script log.",
-      "default": "%TEMP%/List-WeakSecrets.log"
+      "description": "Path to the /proc/modules file used for analyzing loaded kernel modules.",
+      "default": "/proc/modules"
     },
     {
       "name": "ARLog",
       "type": "string",
       "required": false,
       "description": "Active Response NDJSON output path (atomic overwrite; falls back to .new if locked).",
-      "default": "C:\\Program Files (x86)\\ossec-agent\\active-response\\active-responses.log"
+      "default": "/var/ossec/active-response/active-responses.log"
     },
     {
-      "name": "RootDir",
+      "name": "LogPath",
       "type": "string",
       "required": false,
-      "description": "Root directory to scan for files containing potential secrets.",
-      "default": "C:\\"
+      "description": "Path to the rotating human-readable script log.",
+      "default": "/tmp/Detect-Rootkits-script.log"
     },
     {
-      "name": "ExcludeSystem",
-      "type": "boolean",
-      "required": false,
-      "description": "Exclude system directories from scanning (Windows, Program Files, ProgramData).",
-      "default": false
-    },
-    {
-      "name": "MaxSizeMB",
+      "name": "LogMaxKB",
       "type": "integer",
       "required": false,
-      "description": "Maximum file size (in MB) to scan.",
-      "default": 50
+      "description": "Maximum size of the log file (KB) before rotation.",
+      "default": 100
+    },
+    {
+      "name": "LogKeep",
+      "type": "integer",
+      "required": false,
+      "description": "Number of rotated log files to keep.",
+      "default": 5
     }
   ],
-  "repo_url": "https://github.com/socfortress/WINDOWS-LIST-WEAK-SECRETS-ACTIVERESPONSE",
-  "script_name": "List-WeakSecrets.ps1",
+  "repo_url": "https://github.com/socfortress/LINUX-DETECT-ROOTKITS-COPILOT-ACTION",
+  "script_name": "Detect-Rootkits.sh",
   "version": "1.0.0",
-  "last_updated": "2025-08-22T00:00:00Z"
+  "last_updated": "2025-08-23T00:00:00Z"
 }
