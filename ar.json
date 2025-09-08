@@ -40,7 +40,7 @@
       "default": 5
     }
   ],
-  "repo_url": "https://raw.githubusercontent.com/socfortress/LINUX-DETECT-ROOTKITS-COPILOT-ACTION/refs/heads/main",
+  "repo_url": "https://raw.githubusercontent.com/socfortress/LINUX-DETECT-ROOTKITS-COPILOT-ACTION/refs/heads/main/",
   "script_name": "Detect-Rootkits.sh",
   "version": "1.0.0",
   "last_updated": "2025-08-23T00:00:00Z"
