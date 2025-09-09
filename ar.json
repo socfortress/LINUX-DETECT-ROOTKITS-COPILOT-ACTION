@@ -3,44 +3,7 @@
   "description": "Detects potential rootkits by scanning loaded kernel modules for suspicious characteristics. Flags unsigned modules, modules loaded from temporary directories, and hidden modules that do not appear in lsmod. Produces structured NDJSON output including module name, file path, and reason for flagging. Writes results atomically to the Active Response log with .new fallback if locked.",
   "technology": "Linux",
   "icon": "linux",
-  "script_parameters": [
-    {
-      "name": "PROC_MODULES_FILE",
-      "type": "string",
-      "required": false,
-      "description": "Path to the /proc/modules file used for analyzing loaded kernel modules.",
-      "default": "/proc/modules"
-    },
-    {
-      "name": "ARLog",
-      "type": "string",
-      "required": false,
-      "description": "Active Response NDJSON output path (atomic overwrite; falls back to .new if locked).",
-      "default": "/var/ossec/active-response/active-responses.log"
-    },
-    {
-      "name": "LogPath",
-      "type": "string",
-      "required": false,
-      "description": "Path to the rotating human-readable script log.",
-      "default": "/tmp/Detect-Rootkits-script.log"
-    },
-    {
-      "name": "LogMaxKB",
-      "type": "integer",
-      "required": false,
-      "description": "Maximum size of the log file (KB) before rotation.",
-      "default": 100
-    },
-    {
-      "name": "LogKeep",
-      "type": "integer",
-      "required": false,
-      "description": "Number of rotated log files to keep.",
-      "default": 5
-    }
-  ],
-  "repo_url": "https://raw.githubusercontent.com/socfortress/LINUX-DETECT-ROOTKITS-COPILOT-ACTION/refs/heads/main/",
+  "repo_url": "https://raw.githubusercontent.com/socfortress/LINUX-DETECT-ROOTKITS-COPILOT-ACTION/refs/heads/main/Detect-Rootkits.sh",
   "script_name": "Detect-Rootkits.sh",
   "version": "1.0.0",
   "last_updated": "2025-08-23T00:00:00Z"
